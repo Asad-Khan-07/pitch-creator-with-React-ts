@@ -1,16 +1,22 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Sparkles, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import supabase from "@/supabasecreate";
+import { UserContext } from "@/authcontext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate=useNavigate()
-
+const {user,setUser}=useContext(UserContext)
   const Logout = async () => {
     const { error } = await supabase.auth.signOut();
-    if (error) alert(error.message);
-    else {
+    if (error) {
+      alert(error.message);
+    }else {
+      localStorage.setItem("username", JSON.stringify(false));
+      const username = JSON.parse(localStorage.getItem("username"));
+      console.log(username); // true
+      setUser(username)
       navigate("/");
     //      toast.success("Signed out successfully!", {
     //   position: "bottom-right",
@@ -113,11 +119,11 @@ const Navbar = () => {
                   Get Started
                 </button>
               </Link>
-              <Link to="/signup">
-                <button className="px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:opacity-90 transition-opacity">
+              {/* <Link> */}
+                <button onClick={Logout} className="px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:opacity-90 transition-opacity">
                  Log Out
                 </button>
-              </Link>
+              {/* </Link> */}
             </div>
           </div>
         )}

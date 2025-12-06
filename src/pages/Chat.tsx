@@ -143,8 +143,8 @@ const Chat = () => {
       .order("Time", {nullsFirst:true, ascending: false });
       
     if (!error) {
-      console.log("Loading.....");
-      console.log(data);
+      // console.log("Loading.....");
+      // console.log(data);
       // setMessages(data)
       setMessages([...messages, { role: "user", content: data[0] }]);
       setMessages(
@@ -156,7 +156,7 @@ const Chat = () => {
           .flat()
       );
       ;
-      console.log(messages);
+      // console.log(messages);
 
     }
   };

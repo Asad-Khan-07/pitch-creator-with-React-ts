@@ -1,8 +1,9 @@
-import { Search, FileText, Image, Calendar, MoreVertical, Download, Eye } from "lucide-react";
+import { Search, FileText, Image, Calendar, MoreVertical, Download, Eye, ArrowBigDownIcon, ArrowDown, ArrowUp, Backpack, Outdent, ArrowRightSquare} from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import supabase from "@/supabasecreate";
+import { jsPDF } from "jspdf";
 
 const History = () => {
 
@@ -10,11 +11,28 @@ const [userhistory,setUserhistory]=useState([])
 const [monthhistory,setMonthhistory]=useState([])
 const [searchinput,setSearchinput]=useState("")
 const [firstfive,setFirstfive]=useState([])
+const [searchhistory,setSearchhistory]=useState(undefined)
 const [show,setShow]=useState(true)
 
 
 // let firstfive=userhistory.slice(0,5)
 // console.log(firstfive);
+
+
+
+const handleExport = (User_Startup,Generated_Pitch) => {
+  const doc = new jsPDF();
+
+  doc.setFontSize(18);
+  doc.text(User_Startup, 10, 20);
+
+  doc.setFontSize(12);
+  doc.text(Generated_Pitch, 10, 35, { maxWidth: 180 });
+
+  doc.save(`${User_Startup}.pdf`);
+};
+
+
 
 useEffect(() => {
   const history = async () => {
@@ -60,7 +78,7 @@ const history=async ()=> {
   
   const user=await supabase.auth.getUser()
 
-  console.log(user.data.user.email);
+  // console.log(user.data.user.email);
   const { data, error } = await supabase
 .from("Model")
 .select("*")
@@ -116,13 +134,19 @@ const pitches = [
 
 
 const searchbtn = () => {
+    if (!searchinput.trim()) return;
+
+
   const item = userhistory.filter((i) =>
    i.User_Startup===searchinput.toLowerCase()
   );
 
   if (item.length > 0) {
     console.log(item);
-    // setSearchinput(item)
+    setSearchhistory(item)
+    setShow(!show)
+    console.log(show);
+    
   } else {
     console.log("items not found");
   }
@@ -130,8 +154,7 @@ const searchbtn = () => {
 const Loadmore=()=>{
  
   setFirstfive(userhistory.slice(0));
-  console.log(firstfive)
-  console.log(userhistory)
+  
 }
 
 
@@ -202,12 +225,23 @@ const Loadmore=()=>{
                 </div>
                 <Image className="w-10 h-10 text-accent-foreground/20" />
               </div>
+              
             </div>
+          {(show === false)?
+          <div className="mt-8 flex justify-center ">
+            <button onClick={()=>{setShow(!show)}} className="px-8 py-3 flex  rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-base font-medium">
+              Back
+             <ArrowRightSquare/>
+            </button>
+          </div>:""  
+        }
+          
           </div>
 
           {/* Pitch Cards Grid */}
 
-        {(show == true)?
+        {(show === true)?
+        
           <div className="grid md:grid-cols-2 gap-6">
             {firstfive.map((pitch,i) => (
               <div  className="overflow-auto rounded-lg border border-border bg-card hover:shadow-lg transition-shadow group">
@@ -232,7 +266,7 @@ const Loadmore=()=>{
                       
                     </span>
                   
-                    <button className="flex-1 h-9 px-3 py-2 rounded-md bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:opacity-90 transition-opacity text-sm font-medium inline-flex items-center justify-center gap-2">
+                    <button onClick={() => handleExport(pitch.User_Startup,pitch.Generated_Pitch)} className="flex-1 h-9 px-3 py-2 rounded-md bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:opacity-90 transition-opacity text-sm font-medium inline-flex items-center justify-center gap-2">
                       <Download className="w-4 h-4" />
                       Export
                     </button>
@@ -241,15 +275,53 @@ const Loadmore=()=>{
               </div>
             ))}
           </div>
-          :""
+          :<div className="grid md:grid-cols-2 gap-6 ">
+            
+            {searchhistory.map((pitch,i) => (
+              <div  className="overflow-auto rounded-lg border border-border bg-card hover:shadow-lg transition-shadow group">
+
+                <div className="p-6" key={i}>
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="overflow-auto">
+                      <h3 className="text-lg font-semibold mb-1">{pitch.User_Startup}</h3>
+                      <p className="text-sm text-muted-foreground text-justify flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        {new Date(pitch.date).toLocaleDateString()}
+                        {pitch.Generated_Pitch}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 pt-4 border-t border-border">
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-xs font-medium `}
+                    >
+                      {pitch.status}
+                      
+                    </span>
+                  
+                    <button onClick={() => handleExport(pitch.User_Startup,pitch.Generated_Pitch)} className="flex-1 h-9 px-3 py-2 rounded-md bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:opacity-90 transition-opacity text-sm font-medium inline-flex items-center justify-center gap-2">
+                      <Download className="w-4 h-4" />
+                      Export
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
         }
 
           {/* Load More */}
-          <div className="mt-8 text-center">
-            <button onClick={Loadmore} className="px-8 py-3 rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-base font-medium">
-              Load More Pitches
+            
+          {(show === true)?
+            <div className="mt-8 flex justify-center ">
+            <button onClick={Loadmore} className="px-8 py-3 flex  rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-base font-medium">
+             <ArrowDown/>
+              Show More Pitches
             </button>
-          </div>
+          </div>:""
+          }
         </div>
       </div>
     </div>

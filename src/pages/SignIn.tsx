@@ -1,20 +1,49 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import supabase from "@/supabasecreate";
+import { UserContext } from "@/authcontext";
 
 const SignIn = () => {
 
+
+
+
   const [useremail,SetUseremail]=useState("")
   const [userpassword,SetUserpassword]=useState("")
+  const [currentUser, setCurrentUser] = useState(false);
   const navigate=useNavigate()
+  const {user, setUser}=useContext(UserContext)
+
+
+
+useEffect(() => {
+  
+
+}, []);  // only once on page load
+
+// const getUser = async () => {
+//   const res = await supabase.auth.getUser();
+//   console.log(res);
+
+//   if (res.data.user) {
+//     setUser(true);
+//   }else{
+//     setUser(false)
+//   }
+// };
+
+
+
+
+
 
   const handleSignin = async (email:string,password:string) => {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      
+     const res = await supabase.auth.getUser(); 
 
-    if (error){
+    if (error && !res){
 
       alert(error.message)
       //  toast.error(error.message, {
@@ -27,6 +56,12 @@ const SignIn = () => {
       //   },
       // });
     }else {
+localStorage.setItem("username", JSON.stringify(true));
+const username = JSON.parse(localStorage.getItem("username"));
+
+
+      setUser(JSON.parse(localStorage.getItem("username")))
+ 
       alert("Login Success Fully")
       const sessionId = Date.now().toString();
   localStorage.setItem("chat_session", sessionId);

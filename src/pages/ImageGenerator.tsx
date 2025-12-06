@@ -25,7 +25,7 @@ const ImageGenerator = () => {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8">
-            {/* Generator Form */}
+
             <div className="p-6 rounded-lg border border-border bg-card">
               <div className="space-y-6">
                 <div>

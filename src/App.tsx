@@ -10,8 +10,6 @@ import NotFound from "./pages/NotFound";
 import ToastContainer from "react-toastify"
 import { useEffect, useState } from "react";
 import supabase from "./supabasecreate";
-// import { supabase } from "./supabasecreate";
-// const queryClient = new QueryClient();
 
 const App = () => {
   
@@ -33,7 +31,8 @@ const App = () => {
 
 
   return(
-  // <QueryClientProvider client={queryClient}>
+
+      //  <ToastContainer/>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
@@ -42,12 +41,11 @@ const App = () => {
         <Route path="/chat" element={currentUser ? (<Chat />):"Can not get the Page"} />
         <Route path="/image-generator" element={currentUser ? ( <ImageGenerator />):"Can not get the Page"} />
         <Route path="/history" element={currentUser ? (<History />):"Can not get the Page"} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+
         <Route path="*" element={<NotFound />} />
-      {/* <ToastContainer/> */}
       </Routes>
     </BrowserRouter>
-  // </QueryClientProvider>
+
 )};
 
 export default App;

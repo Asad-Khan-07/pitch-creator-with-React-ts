@@ -66,14 +66,14 @@ const Chat = () => {
     // setText("");
   
     try {
-      // 1️⃣ User input save in Userstartup
+      //  User input save in Userstartup
       // const { error: userError } = await supabase
       //   .from("Userstartup")
       //   .insert([{ role: "user", message: text }]);
   
       // if (userError) console.error("User insert error:", userError);
   
-      // 2️⃣ Send to Gemini API
+      //  Send to Gemini API
       const res = await axios.post(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_AI_KEY}`,
         {
@@ -105,16 +105,16 @@ const Chat = () => {
       );
       
       const aiReply = res.data.candidates[0].content.parts[0].text;
-      // const botMsg = { role: "bot", text: aiReply };
+
       const user=await supabase.auth.getUser()
-      // setAireply((prev) => [...prev, botMsg]);
+
       console.log(aiReply);
-      // 3️⃣ AI output save in Generatepitch
+
       const { error: aiError } = await supabase
         .from("Model")
         .insert([{ User_Startup: input, Generated_Pitch:aiReply, User:user.data.user.email, Session_id:sessionId}]);
         setRefresh(!refresh)
-      // if (aiError) console.error("AI insert error:", aiError);
+
     } catch (error) {
       console.error("Error in sent():", error);
     }

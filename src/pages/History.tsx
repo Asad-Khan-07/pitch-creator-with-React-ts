@@ -7,6 +7,51 @@ import supabase from "@/supabasecreate";
 const History = () => {
 
 const [userhistory,setUserhistory]=useState([])
+const [monthhistory,setMonthhistory]=useState([])
+const [searchinput,setSearchinput]=useState("")
+const [firstfive,setFirstfive]=useState([])
+const [show,setShow]=useState(true)
+
+
+// let firstfive=userhistory.slice(0,5)
+// console.log(firstfive);
+
+useEffect(() => {
+  const history = async () => {
+    const user = await supabase.auth.getUser();
+
+    const now = new Date();
+
+    const startOfMonth = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      1
+    ).toISOString();
+
+    const startOfNextMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      1
+    ).toISOString();
+
+    const { data, error } = await supabase
+    .from("Model")
+      .select("*")
+      .eq("User", user.data.user.email)
+      .gte("Time", startOfMonth)        
+      .lt("Time", startOfNextMonth)     
+      .order("Time", { ascending: false });
+
+    if (error) console.log(error.message);
+    // console.log(data);
+    
+    setMonthhistory(data);
+  };
+
+  history();
+}, []);
+
+
 
 
 
@@ -21,10 +66,10 @@ const history=async ()=> {
 .select("*")
 .eq("User", user.data.user.email) 
 .order("Time", { ascending: false })
-// .limit(200);
-// console.log(data);
+
 setUserhistory(data)
-console.log(userhistory);
+setFirstfive(data.slice(0,5))
+// console.log(data);
 
 if (error) {
   console.log(error.message);
@@ -34,7 +79,7 @@ if (error) {
 history()
 },[])
 
-  const pitches = [
+const pitches = [
     {
       id: 1,
       title: "SaaS Platform Pitch Deck",
@@ -69,6 +114,28 @@ history()
     },
   ];
 
+
+const searchbtn = () => {
+  const item = userhistory.filter((i) =>
+   i.User_Startup===searchinput.toLowerCase()
+  );
+
+  if (item.length > 0) {
+    console.log(item);
+    // setSearchinput(item)
+  } else {
+    console.log("items not found");
+  }
+};
+const Loadmore=()=>{
+ 
+  setFirstfive(userhistory.slice(0));
+  console.log(firstfive)
+  console.log(userhistory)
+}
+
+
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-accent">
       <Navbar />
@@ -88,19 +155,18 @@ history()
           <div className="p-6 mb-8 rounded-lg border border-border bg-card">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" /> */}
                 <input
                   placeholder="Search pitches..."
                   className="w-full h-11 pl-10 pr-3 py-2 rounded-md border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                />
+                  onChange={(e) => { setSearchinput( e.target.value ) }}
+              />
               </div>
               <div className="flex gap-2">
-                <button className="h-11 px-4 py-2 rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors font-medium">
-                  All Types
-                </button>
-                <button className="h-11 px-4 py-2 rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors font-medium inline-flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  Date
+        
+                <button onClick={searchbtn} className="h-11 px-4 py-2 rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors font-medium inline-flex items-center gap-2">
+                  <Search className="w-4 h-4" />
+                  Search
                 </button>
               </div>
             </div>
@@ -122,7 +188,7 @@ history()
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">This Month</p>
-                  <p className="text-3xl font-bold text-foreground">8</p>
+                  <p className="text-3xl font-bold text-foreground">{monthhistory.length}</p>
                 </div>
                 <Calendar className="w-10 h-10 text-secondary/20" />
               </div>
@@ -140,30 +206,20 @@ history()
           </div>
 
           {/* Pitch Cards Grid */}
-          <div className="grid md:grid-cols-2 gap-6">
-            {userhistory.map((pitch) => (
-              <div  className="overflow-auto rounded-lg border border-border bg-card hover:shadow-lg transition-shadow group">
-                {/* <div className="relative">
-                  <img
-                    src={pitch.thumbnail}
-                    alt={pitch.title}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-3 right-3">
-                    <button className="h-8 w-8 rounded-md bg-white/90 hover:bg-white text-foreground transition-colors inline-flex items-center justify-center">
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div> */}
 
-                <div className="p-6">
+        {(show == true)?
+          <div className="grid md:grid-cols-2 gap-6">
+            {firstfive.map((pitch,i) => (
+              <div  className="overflow-auto rounded-lg border border-border bg-card hover:shadow-lg transition-shadow group">
+
+                <div className="p-6" key={i}>
                   <div className="flex items-start justify-between mb-3">
-                    <div className="overflow-auto  border-2 border-red-300">
+                    <div className="overflow-auto">
                       <h3 className="text-lg font-semibold mb-1">{pitch.User_Startup}</h3>
-                      <p className="text-sm text-muted-foreground flex items-center gap-2">
+                      <p className="text-sm text-muted-foreground text-justify flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
                         {new Date(pitch.date).toLocaleDateString()}
-                        {/* {pitch.Generated_Pitch} */}
+                        {pitch.Generated_Pitch}
                       </p>
                     </div>
                   </div>
@@ -173,7 +229,7 @@ history()
                       className={`px-2.5 py-0.5 rounded-full text-xs font-medium `}
                     >
                       {pitch.status}
-                      aadad
+                      
                     </span>
                   
                     <button className="flex-1 h-9 px-3 py-2 rounded-md bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:opacity-90 transition-opacity text-sm font-medium inline-flex items-center justify-center gap-2">
@@ -185,10 +241,12 @@ history()
               </div>
             ))}
           </div>
+          :""
+        }
 
           {/* Load More */}
           <div className="mt-8 text-center">
-            <button className="px-8 py-3 rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-base font-medium">
+            <button onClick={Loadmore} className="px-8 py-3 rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-base font-medium">
               Load More Pitches
             </button>
           </div>

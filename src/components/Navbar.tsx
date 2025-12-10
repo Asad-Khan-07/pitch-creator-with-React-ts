@@ -15,7 +15,6 @@ const {user,setUser}=useContext(UserContext)
     }else {
       localStorage.setItem("username", JSON.stringify(false));
       const username = JSON.parse(localStorage.getItem("username"));
-      console.log(username); // true
       setUser(username)
       navigate("/");
     //      toast.success("Signed out successfully!", {

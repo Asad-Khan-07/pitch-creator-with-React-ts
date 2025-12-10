@@ -9,14 +9,11 @@ const History = () => {
 
 const [userhistory,setUserhistory]=useState([])
 const [monthhistory,setMonthhistory]=useState([])
-const [searchinput,setSearchinput]=useState("")
+const [searchinput,setSearchinput]=useState<string>('')
 const [firstfive,setFirstfive]=useState([])
 const [searchhistory,setSearchhistory]=useState(undefined)
-const [show,setShow]=useState(true)
+const [show,setShow]=useState<boolean>(true)
 
-
-// let firstfive=userhistory.slice(0,5)
-// console.log(firstfive);
 
 
 
@@ -38,9 +35,9 @@ useEffect(() => {
   const history = async () => {
     const user = await supabase.auth.getUser();
 
-    const now = new Date();
+    const now:Date = new Date();
 
-    const startOfMonth = new Date(
+    const startOfMonth:string = new Date(
       now.getFullYear(),
       now.getMonth(),
       1
@@ -78,7 +75,7 @@ const history=async ()=> {
   
   const user=await supabase.auth.getUser()
 
-  // console.log(user.data.user.email);
+
   const { data, error } = await supabase
 .from("Model")
 .select("*")
@@ -87,7 +84,7 @@ const history=async ()=> {
 
 setUserhistory(data)
 setFirstfive(data.slice(0,5))
-// console.log(data);
+
 
 if (error) {
   console.log(error.message);
@@ -142,13 +139,14 @@ const searchbtn = () => {
   );
 
   if (item.length > 0) {
-    console.log(item);
+
     setSearchhistory(item)
     setShow(!show)
-    console.log(show);
+
     
   } else {
     console.log("items not found");
+    setSearchhistory("items not found")
   }
 };
 const Loadmore=()=>{
@@ -174,11 +172,11 @@ const Loadmore=()=>{
             </p>
           </div>
 
-          {/* Search and Filters */}
+
           <div className="p-6 mb-8 rounded-lg border border-border bg-card">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
-                {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" /> */}
+
                 <input
                   placeholder="Search pitches..."
                   className="w-full h-11 pl-10 pr-3 py-2 rounded-md border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
@@ -188,8 +186,18 @@ const Loadmore=()=>{
               <div className="flex gap-2">
         
                 <button onClick={searchbtn} className="h-11 px-4 py-2 rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors font-medium inline-flex items-center gap-2">
-                  <Search className="w-4 h-4" />
-                  Search
+                  
+                                                                
+{show === false ? (
+  <>
+    <ArrowRightSquare /> Back
+  </>
+) : (
+  <>
+    <Search className="w-4 h-4" /> Search
+  </>
+)}
+
                 </button>
               </div>
             </div>
@@ -227,18 +235,11 @@ const Loadmore=()=>{
               </div>
               
             </div>
-          {(show === false)?
-          <div className="mt-8 flex justify-center ">
-            <button onClick={()=>{setShow(!show)}} className="px-8 py-3 flex  rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-base font-medium">
-              Back
-             <ArrowRightSquare/>
-            </button>
-          </div>:""  
-        }
+
           
           </div>
 
-          {/* Pitch Cards Grid */}
+
 
         {(show === true)?
         

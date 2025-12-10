@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Send, Sparkles, User } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import axios from "axios";
@@ -10,28 +10,13 @@ const Chat = () => {
   const sessionId =   localStorage.getItem("chat_session");;
 
 
-    // setMessages([...messages, { role: "user", content: input }]);
-  //   {
-  //     role: "assistant",
-  //     content: "Hello! I'm your AI pitch assistant. Tell me about your business idea and I'll help you create a compelling pitch.",
-  //   },
-  // ]);
 
-  // const handleSend = () => {
-    
-  //   setInput("");
-    
-  //   // Simulate AI response
-  //   setTimeout(() => {
-  //     setMessages((prev) => [
-  //       ...prev,
-  //       {
-  //         role: "assistant",
-  //         content: "Great! Let me help you structure that. What's the main problem your business solves?",
-  //       },
-  //     ]);
-  //   }, 1000);
-  // };
+ const bottom = useRef(null); 
+
+  useEffect(() => {
+    bottom.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
 
 
 
@@ -58,22 +43,13 @@ const Chat = () => {
   
   
   const sent = async () => {
-
+    
     if (!input.trim()) return;
     
-    // const newMessages = [...user, { inp: text }];
-    // setUser(newMessages);
-    // setText("");
+    setMessages([...messages, { role: "user", content:input }]);
   
     try {
-      //  User input save in Userstartup
-      // const { error: userError } = await supabase
-      //   .from("Userstartup")
-      //   .insert([{ role: "user", message: text }]);
-  
-      // if (userError) console.error("User insert error:", userError);
-  
-      //  Send to Gemini API
+
       const res = await axios.post(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_AI_KEY}`,
         {
@@ -109,7 +85,6 @@ const Chat = () => {
       const user=await supabase.auth.getUser()
 
       console.log(aiReply);
-
       const { error: aiError } = await supabase
         .from("Model")
         .insert([{ User_Startup: input, Generated_Pitch:aiReply, User:user.data.user.email, Session_id:sessionId}]);
@@ -139,13 +114,10 @@ const Chat = () => {
       .select("*")
       .eq("User", user.data.user.email)  
       .eq("Session_id", sessionId)
-      // current logged-in user
-      .order("Time", {nullsFirst:true, ascending: false });
+      .order("Time", {nullsFirst:true, ascending: true });
       
     if (!error) {
-      // console.log("Loading.....");
-      // console.log(data);
-      // setMessages(data)
+
       setMessages([...messages, { role: "user", content: data[0] }]);
       setMessages(
         data
@@ -156,7 +128,6 @@ const Chat = () => {
           .flat()
       );
       ;
-      // console.log(messages);
 
     }
   };
@@ -182,9 +153,10 @@ const Chat = () => {
 
           <div className="h-[600px] flex flex-col rounded-lg border border-border bg-card">
             <div className="flex-1 p-6 overflow-y-auto">
-              <div className="space-y-4">
+              <div className="space-y-4" >
                 {messages.map((message, index) => (
                   <div
+                  ref={bottom}
                     key={index}
                     className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                   >
@@ -199,15 +171,15 @@ const Chat = () => {
                     </div>
                   </div>
                 ))}
-              </div>
+              </div >
             </div>
 
             <div className="p-4 border-t border-border">
               <div className="flex gap-2">
                 <input
-                  // value={input}
+
                   onChange={(e) => setInput(e.target.value)}
-                  // onKeyPress={(e) => e.key === "Enter" && handleSend()}
+
                   placeholder="Describe your business idea..."
                   className="flex-1 h-12 px-3 py-2 rounded-md border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 />

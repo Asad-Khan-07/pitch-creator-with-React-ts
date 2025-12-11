@@ -8,6 +8,7 @@ import History from "./pages/History";
 import NotFound from "./pages/NotFound";
 import { useContext, useState } from "react";
 import { UserContext } from "./authcontext";
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   const username = JSON.parse(localStorage.getItem("username"));
@@ -15,7 +16,9 @@ const App = () => {
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
+     <ToastContainer/>
       <BrowserRouter>
+    
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/signin" element={<SignIn />} />

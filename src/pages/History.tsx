@@ -245,9 +245,9 @@ const Loadmore=()=>{
         
           <div className="grid md:grid-cols-2 gap-6">
             {firstfive.map((pitch,i) => (
-              <div  className="overflow-auto rounded-lg border border-border bg-card hover:shadow-lg transition-shadow group">
+              <div key={i}  className="overflow-auto rounded-lg border border-border bg-card hover:shadow-lg transition-shadow group">
 
-                <div className="p-6" key={i}>
+                <div className="p-6" >
                   <div className="flex items-start justify-between mb-3">
                     <div className="overflow-auto">
                       <h3 className="text-lg font-semibold mb-1">{pitch.User_Startup}</h3>

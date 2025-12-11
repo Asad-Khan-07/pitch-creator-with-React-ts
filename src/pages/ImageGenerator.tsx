@@ -6,8 +6,8 @@ import { uploadToStorage, uploadTotable } from "@/storage";
 import supabase from "@/supabasecreate";
 const ImageGenerator = () => {
   const [prompt, setPrompt] = useState("");
-  const [img, setImg] = useState("");
-
+  const [img, setImg] = useState<any>("");
+  const [fetch, setFetch]=useState(false)
 
 
 
@@ -36,13 +36,9 @@ const Generateimage = async (prompt:string) => {
       
       const imgURL = URL.createObjectURL(blob);
       console.error(imgURL);
-    //  await uploadToStorage(blob)
-      // uploadTotable()
-      // setImg(imgURL)
-      // console.log(t);
-      // setError("Image generation failed!");
-      // http://localhost:8080/4ecb8ac9-a3f3-421c-a4f1-c23ec82489dd
-// https://kxqurvkccrqvxwtliqph.supabase.co/storage/v1/object/Images/image_1765293369704.png
+     await uploadToStorage(blob)
+      uploadTotable()
+
     }catch(error){
         console.log("err",error);
         
@@ -52,7 +48,6 @@ const Generateimage = async (prompt:string) => {
   };
 
 
-  // console.log(quality);
 
 
 
@@ -64,7 +59,7 @@ const Generateimage = async (prompt:string) => {
       .select("*")
       .eq("User", user.data.user.email)  
       // .eq("Session_id", sessionId)
-      // .order( {nullsFirst:true, ascending: true });
+      .order("created_at", {nullsFirst:true, ascending: false });
       
     if (error) {
       console.log(error.message);
@@ -73,26 +68,19 @@ const Generateimage = async (prompt:string) => {
     }else{
       console.log(data[0].images);
       setImg(data[0].images)
+      setFetch(true)
     
-    // https://kxqurvkccrqvxwtliqph.supabase.co/storage/v1/object/public/images/image_1765297372339.png
+
     }
   };
 
 
-// upload
-// https://kxqurvkccrqvxwtliqph.supabase.co/storage/v1/object/public/images/image_1765299545586.png
-
-
-// insert
-//https://kxqurvkccrqvxwtliqph.supabase.co/storage/v1/object/public/images/image_1765299545586.png
-
-
 
 useEffect(()=>{
-  // Generateimage("man playing cricket")
+  // Generateimage("man reading the books")
 
   fetchimages()
-},[])
+},[fetch])
 
 
   return (
@@ -147,7 +135,8 @@ useEffect(()=>{
                 </div>
 
                 <button
-                  className="w-full h-12 px-4 py-2 rounded-md bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:opacity-90 transition-opacity text-lg font-medium inline-flex items-center justify-center gap-2"
+                    onClick={()=>{Generateimage(prompt)}}
+                   className="w-full h-12 px-4 py-2 rounded-md bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:opacity-90 transition-opacity text-lg font-medium inline-flex items-center justify-center gap-2"
                 >
                   <Wand2 className="w-5 h-5" />
                   Generate Image
@@ -185,11 +174,24 @@ useEffect(()=>{
                       <img
                         src={img}
                         alt={`Generated `}
-                        className="w-full h-64 object-cover"
+                        className="w-full h-64"
+                        // width={100}
                       />
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                         <button
+                          
+                          onClick={()=>{
+                  const link = document.createElement("a");
+        link.href ="https://kxqurvkccrqvxwtliqph.supabase.co/storage/v1/object/public/images/image_1765353801891.png";
+        link.download="https://kxqurvkccrqvxwtliqph.supabase.co/storage/v1/object/public/images/image_1765353801891.png";
+        link.click();
+              }}
+
+                          
                           className="px-3 py-2 h-9 rounded-md bg-white/90 hover:bg-white text-foreground transition-colors text-sm font-medium inline-flex items-center gap-2"
+
+                    
+
                         >
                           <Download className="w-4 h-4" />
                           Download

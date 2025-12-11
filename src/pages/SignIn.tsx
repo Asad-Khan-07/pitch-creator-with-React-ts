@@ -3,7 +3,7 @@ import { Sparkles } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import supabase from "@/supabasecreate";
 import { UserContext } from "@/authcontext";
-
+import {toast} from "react-toastify"
 const SignIn = () => {
 
 
@@ -62,10 +62,10 @@ const username = JSON.parse(localStorage.getItem("username"));
 
       setUser(JSON.parse(localStorage.getItem("username")))
  
-      alert("Login Success Fully")
+      // alert("Login Success Fully")
       const sessionId = Date.now().toString();
   localStorage.setItem("chat_session", sessionId);
-
+         
       navigate("/chat")
 // toast.success("Welcome back!", {
 //   position: "bottom-right",

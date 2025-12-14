@@ -180,25 +180,25 @@ useEffect(()=>{
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                         <button
                           
-onClick={async () => {
-  try {
-    const response = await fetch(img);
-    const blob = await response.blob();
+// onClick={async () => {
+//   try {
+//     const response = await fetch(img);
+//     const blob = await response.blob();
 
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+//     const url = window.URL.createObjectURL(blob);
+//     const link = document.createElement("a");
 
-    link.href = url;
-    link.download =img.split("/").pop();
-    document.body.appendChild(link);
-    link.click();
+//     link.href = url;
+//     link.download =img.split("/").pop();
+//     document.body.appendChild(link);
+//     link.click();
 
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-  } catch (err) {
-    console.error("Download failed", err);
-  }
-}}
+//     document.body.removeChild(link);
+//     window.URL.revokeObjectURL(url);
+//   } catch (err) {
+//     console.error("Download failed", err);
+//   }
+// }}
 
                           
                           className="px-3 py-2 h-9 rounded-md bg-white/90 hover:bg-white text-foreground transition-colors text-sm font-medium inline-flex items-center gap-2"

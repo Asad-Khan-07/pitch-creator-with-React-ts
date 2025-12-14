@@ -7,8 +7,8 @@ const Chat = () => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([])
   const [refresh, setRefresh] = useState(false)
+  const [loader, setLoader] = useState(false)
   const sessionId =   localStorage.getItem("chat_session");;
-
 
 
  const bottom = useRef(null); 
@@ -21,23 +21,6 @@ const Chat = () => {
 
 
 
-
-  const [currentUser, setCurrentUser] = useState(false);
-
-  useEffect(() => {
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setCurrentUser(!!session?.user);
-    });
-
-    supabase.auth.getSession().then(({ data }) => {
-      setCurrentUser(!!data?.session?.user);
-    });
-
-    return () => {
-      listener.subscription.unsubscribe();
-    };
-  }, []);
-  
   
 
   
@@ -47,7 +30,8 @@ const Chat = () => {
     if (!input.trim()) return;
     
     setMessages([...messages, { role: "user", content:input }]);
-  
+  setLoader(true)
+
     try {
 
       const res = await axios.post(
@@ -81,10 +65,8 @@ const Chat = () => {
       );
       
       const aiReply = res.data.candidates[0].content.parts[0].text;
-
       const user=await supabase.auth.getUser()
 
-      console.log(aiReply);
       const { error: aiError } = await supabase
         .from("Model")
         .insert([{ User_Startup: input, Generated_Pitch:aiReply, User:user.data.user.email, Session_id:sessionId}]);
@@ -92,6 +74,8 @@ const Chat = () => {
 
     } catch (error) {
       console.error("Error in sent():", error);
+    }finally{
+      setLoader(false)
     }
   
   
@@ -146,14 +130,22 @@ const Chat = () => {
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               AI Pitch Assistant
             </h1>
-            <p className="text-muted-foreground">
-              Create your perfect pitch through conversation
-            </p>
+
           </div>
 
           <div className="h-[600px] flex flex-col rounded-lg border border-border bg-card">
             <div className="flex-1 p-6 overflow-y-auto">
               <div className="space-y-4" >
+
+                 {messages.length === 0 ? <div className=" flex items-center flex-col justify-around h-96 w-full ">
+                        <div className="icon-load ">
+
+                                       <Sparkles size={100} className="text-primary" />
+                                       </div>
+                                        <p className="text-muted-foreground text-2xl font-semibold">
+                                       Create your perfect pitch through conversation
+                                       </p>
+                        </div> : ""}
                 {messages.map((message, index) => (
                   <div
                   ref={bottom}
@@ -165,13 +157,18 @@ const Chat = () => {
                         message.role === "user"
                           ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground"
                           : "bg-muted text-foreground"
-                      }`}
+                        }`}
                     >
-                      <p className="text-sm">{message.content}</p>
+                      <p className="text-sm text-justify">{message.content}</p>
                     </div>
                   </div>
                 ))}
+                      
               </div >
+              {loader ?
+
+                <div className="loader"></div>:""
+              }
             </div>
 
             <div className="p-4 border-t border-border">

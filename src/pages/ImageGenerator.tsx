@@ -6,7 +6,7 @@ import { uploadToStorage, uploadTotable } from "@/storage";
 import supabase from "@/supabasecreate";
 const ImageGenerator = () => {
   const [prompt, setPrompt] = useState("");
-  const [img, setImg] = useState<any>("");
+  const [img, setImg] = useState<any>([]);
   const [fetch, setFetch]=useState(false)
 
 
@@ -17,7 +17,7 @@ const MODEL_PARAMS:{num_inference_steps:number; guidance_scale:number; width:num
     num_inference_steps: 4,
     guidance_scale:4,
     width: 500,
-    height: 450,
+    height: 500,
   };
 
 
@@ -180,12 +180,25 @@ useEffect(()=>{
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                         <button
                           
-                          onClick={()=>{
-                  const link = document.createElement("a");
-        link.href ="https://kxqurvkccrqvxwtliqph.supabase.co/storage/v1/object/public/images/image_1765353801891.png";
-        link.download="https://kxqurvkccrqvxwtliqph.supabase.co/storage/v1/object/public/images/image_1765353801891.png";
-        link.click();
-              }}
+onClick={async () => {
+  try {
+    const response = await fetch(img);
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download =img.split("/").pop();
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error("Download failed", err);
+  }
+}}
 
                           
                           className="px-3 py-2 h-9 rounded-md bg-white/90 hover:bg-white text-foreground transition-colors text-sm font-medium inline-flex items-center gap-2"

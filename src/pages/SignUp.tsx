@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Sparkles } from "lucide-react";
 import { useState } from "react";
 import supabase from "@/supabasecreate";
+import { toast } from "react-toastify";
 const SignUp = () => {
 
   const [useremail,SetUseremail]=useState("")
@@ -16,44 +17,91 @@ const SignUp = () => {
           alert(error.message)
           //  console.log(import.meta.env.VITE_SUP_URL);
             
-          //  toast.error(error.message, {
-          //   position: "bottom-right",
-          //   style: {
-          //     background: "rgba(255,255,255,0.1)",
-            //     backdropFilter: "blur(10px)",
-          //     border: "1px solid rgba(255,255,255,0.2)",
-          //     color: "#fff",
-          //   },
-          // });;
+toast.success(error.message, {
+  position: "bottom-right",
+  icon: (
+    <span
+      style={{
+        background: "linear-gradient(to right, #fa8638, #089faf)",
+        WebkitBackgroundClip: "text",
+        color: "#ffffff",
+        fontSize: "1.3rem",
+        fontWeight: "bold",
+      }}
+    >
+      ✔
+    </span>
+  ),
+  style: {
+    background: "linear-gradient(to right, #fa8638, #089faf)",
+    color: "#ffffff",
+    borderRadius: "0.75rem",
+    fontWeight: "500",
+    boxShadow: "0 0 15px rgba(16,185,129,0.3)",
+  },
+
+});
+
         
         
         }else {
 
-          alert("Account SuccessFully Created")
+
           navigate("/signin")
-          //  toast.success("Account created successfully!", {
-          //   position: "bottom-right",
-          //   style: {
-          //     background: "linear-gradient(to right, #10b981, #047857)",
-          //     color: "#fff",
-          //     borderRadius: "0.75rem",
-          //     fontWeight: "500",
-          //     boxShadow: "0 0 15px rgba(16,185,129,0.3)",
-          //   },
-          //   progressStyle: { background: "#6ee7b7" },
-          // });
+          toast.success("Account SuccessFully Created", {
+  position: "bottom-right",
+  icon: (
+    <span
+      style={{
+        background: "linear-gradient(to right, #fa8638, #089faf)",
+        WebkitBackgroundClip: "text",
+        color: "#ffffff",
+        fontSize: "1.3rem",
+        fontWeight: "bold",
+      }}
+    >
+      ✔
+    </span>
+  ),
+  style: {
+    background: "linear-gradient(to right, #fa8638, #089faf)",
+    color: "#ffffff",
+    borderRadius: "0.75rem",
+    fontWeight: "500",
+    boxShadow: "0 0 15px rgba(16,185,129,0.3)",
+  },
+
+});
+
+
     
         }} catch (error) {
-          alert(error.message)
-          //        toast.error(error.message, {
-          //   position: "bottom-right",
-          //   style: {
-          //     background: "rgba(255,255,255,0.1)",
-          //     backdropFilter: "blur(10px)",
-          //     border: "1px solid rgba(255,255,255,0.2)",
-          //     color: "#fff",
-          //   },
-          // });;  
+
+          toast.error(error.message, {
+  position: "bottom-right",
+  icon: (
+    <span
+      style={{
+        background: "linear-gradient(to right, #fa8638, #089faf)",
+        WebkitBackgroundClip: "text",
+        color: "#ffffff",
+        fontSize: "1.3rem",
+        fontWeight: "bold",
+      }}
+    >
+      ✔
+    </span>
+  ),
+  style: {
+    background: "linear-gradient(to right, #fa8638, #089faf)",
+    color: "#ffffff",
+    borderRadius: "0.75rem",
+    fontWeight: "500",
+    boxShadow: "0 0 15px rgba(16,185,129,0.3)",
+  },
+
+});
+
         }    
       };
 

@@ -1,4 +1,5 @@
 import supabase from "@/supabasecreate";
+import jsPDF from "jspdf";
 
     const fileName = `image_${Date.now()}.png`;
 
@@ -76,3 +77,20 @@ export const uploadTotable = async () => {
     // return null;
   }
 };
+
+
+
+export const handleExport = (User_Startup,Generated_Pitch) => {
+  const doc = new jsPDF();
+
+  doc.setFontSize(18);
+  doc.text(User_Startup, 10, 20);
+
+  doc.setFontSize(12);
+  doc.text(Generated_Pitch, 10, 35, { maxWidth: 180 });
+
+  doc.save(`${User_Startup}.pdf`);
+};
+
+
+

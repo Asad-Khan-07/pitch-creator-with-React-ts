@@ -3,6 +3,8 @@ import { Sparkles, Menu, X } from "lucide-react";
 import { useContext, useState } from "react";
 import supabase from "@/supabasecreate";
 import { UserContext } from "@/authcontext";
+import { toast } from "react-toastify";
+// import "./index.css";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,18 +18,34 @@ const {user,setUser}=useContext(UserContext)
       localStorage.setItem("username", JSON.stringify(false));
       const username = JSON.parse(localStorage.getItem("username"));
       setUser(username)
-      navigate("/");
-    //      toast.success("Signed out successfully!", {
-    //   position: "bottom-right",
-    //   style: {
-    //     background: "linear-gradient(to right, #2563eb, #1e40af)", 
-    //     color: "#fff",
-    //     borderRadius: "0.75rem",
-    //     fontWeight: "500",
-    //     boxShadow: "0 0 15px rgba(37,99,235,0.3)",
-    //   },
-    //   progressStyle: { background: "#93c5fd" },
-    // });
+      navigate("/signin");
+  toast.success("LogOut SuccessFully", {
+  position: "bottom-right",
+  className: "my-toast",
+  icon: (
+    <span
+      style={{
+        background: "linear-gradient(to right, #fa8638, #089faf)",
+        WebkitBackgroundClip: "text",
+        color: "#ffffff",
+        fontSize: "1.3rem",
+        fontWeight: "bold",
+      }}
+    >
+      ✔
+    </span>
+  ),
+  style: {
+    background: "linear-gradient(to right, #fa8638, #089faf)",
+    color: "#ffffff",
+    borderRadius: "0.75rem",
+    fontWeight: "500",
+    boxShadow: "0 0 15px rgba(16,185,129,0.3)",
+  },
+  progressClassName:"Toastify__progress-bar"
+
+});
+
     }
   };
 

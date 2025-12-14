@@ -67,29 +67,44 @@ const username = JSON.parse(localStorage.getItem("username"));
   localStorage.setItem("chat_session", sessionId);
          
       navigate("/chat")
-// toast.success("Welcome back!", {
-//   position: "bottom-right",
-//   style: {
-//     background: "linear-gradient(to right, #10b981, #047857)", // green gradient
-//     color: "#fff",
-//     borderRadius: "0.75rem",
-//     fontWeight: "500",
-//     boxShadow: "0 0 15px rgba(16,185,129,0.3)",
-//   },
-// });
+toast.success("Login Succesfuly!", {
+  position: "bottom-right",
+  icon: (
+    <span
+      style={{
+        background: "linear-gradient(to right, #fa8638, #089faf)",
+        WebkitBackgroundClip: "text",
+        color: "#ffffff",
+        fontSize: "1.3rem",
+        fontWeight: "bold",
+      }}
+    >
+      ✔
+    </span>
+  ),
+  style: {
+    background: "linear-gradient(to right, #fa8638, #089faf)",
+    color: "#ffffff",
+    borderRadius: "0.75rem",
+    fontWeight: "500",
+    boxShadow: "0 0 15px rgba(16,185,129,0.3)",
+  },
+
+});
+
 
     }
     } catch (error) {
       alert(error.message)
-      //    toast.error(error.message, {
-      //   position: "bottom-right",
-      //   style: {
-      //     background: "rgba(255,255,255,0.1)",
-      //     backdropFilter: "blur(10px)",
-      //     border: "1px solid rgba(255,255,255,0.2)",
-      //     color: "#fff",
-      //   },
-      // });
+         toast.error(error.message, {
+        position: "bottom-right",
+        style: {
+          background: "rgba(255,255,255,0.1)",
+          backdropFilter: "blur(10px)",
+          border: "1px solid rgba(255,255,255,0.2)",
+          color: "#fff",
+        },
+      });
     }
   };
 

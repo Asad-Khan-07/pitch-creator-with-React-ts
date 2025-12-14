@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import supabase from "@/supabasecreate";
 import { jsPDF } from "jspdf";
+import { handleExport } from "@/storage";
 
 const History = () => {
 
@@ -13,21 +14,13 @@ const [searchinput,setSearchinput]=useState<string>('')
 const [firstfive,setFirstfive]=useState([])
 const [searchhistory,setSearchhistory]=useState(undefined)
 const [show,setShow]=useState<boolean>(true)
+const [segment,setSegment]=useState<boolean>(true)
+const [image,setImages]=useState([])
 
 
 
 
-const handleExport = (User_Startup,Generated_Pitch) => {
-  const doc = new jsPDF();
 
-  doc.setFontSize(18);
-  doc.text(User_Startup, 10, 20);
-
-  doc.setFontSize(12);
-  doc.text(Generated_Pitch, 10, 35, { maxWidth: 180 });
-
-  doc.save(`${User_Startup}.pdf`);
-};
 
 
 
@@ -94,42 +87,6 @@ if (error) {
 history()
 },[])
 
-const pitches = [
-    {
-      id: 1,
-      title: "SaaS Platform Pitch Deck",
-      date: "2024-03-15",
-      type: "deck",
-      status: "completed",
-      thumbnail: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&h=200&fit=crop",
-    },
-    {
-      id: 2,
-      title: "Product Launch Strategy",
-      date: "2024-03-14",
-      type: "strategy",
-      status: "draft",
-      thumbnail: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=300&h=200&fit=crop",
-    },
-    {
-      id: 3,
-      title: "Investor Presentation Q1",
-      date: "2024-03-10",
-      type: "presentation",
-      status: "completed",
-      thumbnail: "https://images.unsplash.com/photo-1557426272-fc759fdf7a8d?w=300&h=200&fit=crop",
-    },
-    {
-      id: 4,
-      title: "Marketing Campaign Pitch",
-      date: "2024-03-08",
-      type: "campaign",
-      status: "completed",
-      thumbnail: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=300&h=200&fit=crop",
-    },
-  ];
-
-
 const searchbtn = () => {
     if (!searchinput.trim()) return;
 
@@ -157,6 +114,38 @@ const Loadmore=()=>{
 
 
 
+
+  const Fetchimages = async () => {
+    const user=await supabase.auth.getUser()
+    const { data, error } = await supabase
+    
+    .from("Images")
+      .select("*")
+      .eq("User", user.data.user.email)  
+      // .eq("Session_id", sessionId)
+      .order("created_at", {ascending: false });
+      
+    if (error) {
+      console.log(error.message);
+      
+      
+    }else{
+      // console.log(data);
+
+      setImages(data)
+      // setFetch(true)
+    
+
+    }
+  };
+
+
+
+useEffect(()=>{
+Fetchimages()
+},[])
+
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-accent">
       <Navbar />
@@ -173,7 +162,7 @@ const Loadmore=()=>{
           </div>
 
 
-          <div className="p-6 mb-8 rounded-lg border border-border bg-card">
+          {/* <div className="p-6 mb-8 rounded-lg border border-border bg-card">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
 
@@ -201,7 +190,7 @@ const Loadmore=()=>{
                 </button>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -229,7 +218,7 @@ const Loadmore=()=>{
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Images Generated</p>
-                  <p className="text-3xl font-bold text-foreground">156</p>
+                  <p className="text-3xl font-bold text-foreground">{image.length}</p>
                 </div>
                 <Image className="w-10 h-10 text-accent-foreground/20" />
               </div>
@@ -238,6 +227,56 @@ const Loadmore=()=>{
 
           
           </div>
+
+
+
+
+
+<div className="grid md:grid-cols-2 gap-6">
+                {/* <div className="border-4" onClick={()=>{setSegment(true)}}> <button className="outline-4">Pitches</button></div>
+                <div className="border-4" ></div> */}
+                <button className="border-4"  onClick={()=>{setSegment(true)}}>Pitches</button>
+                <button className="border-4"  onClick={()=>{setSegment(false)}}>Imgaes</button>
+          </div>
+
+
+
+{segment?
+
+    <div className="">
+      
+
+
+           <div className="p-6 mb-8 rounded-lg border border-border bg-card">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+
+                <input
+                  placeholder="Search pitches..."
+                  className="w-full h-11 pl-10 pr-3 py-2 rounded-md border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  onChange={(e) => { setSearchinput( e.target.value ) }}
+              />
+              </div>
+              <div className="flex gap-2">
+        
+                <button onClick={searchbtn} className="h-11 px-4 py-2 rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors font-medium inline-flex items-center gap-2">
+                  
+                                                                
+{show === false ? (
+  <>
+    <ArrowRightSquare /> Back
+  </>
+) : (
+  <>
+    <Search className="w-4 h-4" /> Search
+  </>
+)}
+
+                </button>
+              </div>
+            </div>
+          </div> 
+
 
 
 
@@ -312,17 +351,99 @@ const Loadmore=()=>{
           </div>
 
         }
+  </div>
+:<div className="grid md:grid-cols-2 gap-6">
+            {image.map((pitch,i) => (
+              <div key={i}  className="overflow-auto rounded-lg border border-border bg-card hover:shadow-lg transition-shadow group">
+
+                <div className="p-6" >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="overflow-auto">
+                      {/* <h3 className="text-lg font-semibold mb-1">{pitch.User_Startup}</h3> */}
+                      {/* <p className="text-sm text-muted-foreground text-justify flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        {new Date(pitch.date).toLocaleDateString()}
+                        {pitch.Generated_Pitch}
+                      </p> */}
+                      <img src={pitch.images} alt=""  />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 pt-4 border-t border-border">
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-xs font-medium `}
+                    >
+                      {/* {pitch.status} */}
+                      
+                    </span>
+                  
+                    <button 
+     
+
+onClick={async () => {
+  try {
+    const response = await fetch(pitch.images);
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download =pitch.images.split("/").pop();
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error("Download failed", err);
+  }
+}}
+
+                    className="flex-1 h-9 px-3 py-2 rounded-md bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:opacity-90 transition-opacity text-sm font-medium inline-flex items-center justify-center gap-2">
+                      <Download className="w-4 h-4" />
+                      Dowload
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
           {/* Load More */}
             
-          {(show === true)?
+          {/* {(show === true)?
             <div className="mt-8 flex justify-center ">
             <button onClick={Loadmore} className="px-8 py-3 flex  rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-base font-medium">
              <ArrowDown/>
               Show More Pitches
             </button>
           </div>:""
-          }
+          } */}
         </div>
       </div>
     </div>

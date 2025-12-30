@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import { HfInference } from "@huggingface/inference";
 import { uploadToStorage, uploadTotable } from "@/storage";
 import supabase from "@/supabasecreate";
+import { toast } from "react-toastify";
 const ImageGenerator = () => {
   const [prompt, setPrompt] = useState("");
   const [img, setImg] = useState<any>([]);
@@ -40,7 +41,22 @@ const Generateimage = async (prompt:string) => {
       uploadTotable()
 
     }catch(error){
-        console.log("err",error);
+
+      toast.error("Internal Error ", {
+        position: "bottom-right",
+
+        style: {
+          background: "linear-gradient(to right, #fa8638, #089faf)",
+          color: "#ffffff",
+          borderRadius: "0.75rem",
+          fontWeight: "500",
+          boxShadow: "0 0 15px rgba(16,185,129,0.3)",
+        },
+      
+      });
+      
+
+        // console.log("err",error);
         
     } finally {
       // setLoading(false);
@@ -62,11 +78,25 @@ const Generateimage = async (prompt:string) => {
       .order("created_at", {nullsFirst:true, ascending: false });
       
     if (error) {
+
+toast.error(error.message, {
+  position: "bottom-right",
+  
+  style: {
+    background: "linear-gradient(to right, #fa8638, #089faf)",
+    color: "#ffffff",
+    borderRadius: "0.75rem",
+    fontWeight: "500",
+    boxShadow: "0 0 15px rgba(16,185,129,0.3)",
+  },
+
+});
+
       console.log(error.message);
       
       
     }else{
-      console.log(data[0].images);
+      // console.log(data[0].images);
       setImg(data[0].images)
       setFetch(true)
     

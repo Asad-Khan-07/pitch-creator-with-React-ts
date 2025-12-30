@@ -3,6 +3,8 @@ import { Send, Sparkles, User } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import axios from "axios";
 import supabase from "@/supabasecreate";
+import { Navigate, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 const Chat = () => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([])
@@ -12,12 +14,10 @@ const Chat = () => {
 
 
  const bottom = useRef(null); 
-
+const navigate=useNavigate()
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-
 
 
 
@@ -73,7 +73,20 @@ const Chat = () => {
         setRefresh(!refresh)
 
     } catch (error) {
-      console.error("Error in sent():", error);
+      toast.success(`${error} error to sent`, {
+        position: "bottom-right",
+      
+        style: {
+          background: "linear-gradient(to right, #fa8638, #089faf)",
+          color: "#ffffff",
+          borderRadius: "0.75rem",
+          fontWeight: "500",
+          boxShadow: "0 0 15px rgba(16,185,129,0.3)",
+        },
+      
+      });
+      
+      // console.error("Error in sent():", error);
     }finally{
       setLoader(false)
     }
@@ -92,6 +105,7 @@ const Chat = () => {
   
   const fetchMessages = async () => {
     const user=await supabase.auth.getUser()
+    console.log(user);
     const { data, error } = await supabase
     
     .from("Model")
@@ -142,8 +156,8 @@ const Chat = () => {
 
                                        <Sparkles size={100} className="text-primary" />
                                        </div>
-                                        <p className="text-muted-foreground text-2xl font-semibold">
-                                       Create your perfect pitch through conversation
+                                        <p className="text-muted-foreground text-center text-2xl font-semibold">
+                                       Create your perfect pitch through conversation!
                                        </p>
                         </div> : ""}
                 {messages.map((message, index) => (

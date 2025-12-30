@@ -4,65 +4,108 @@ import { useContext, useEffect, useState } from "react";
 import supabase from "@/supabasecreate";
 import { UserContext } from "@/authcontext";
 import {toast} from "react-toastify"
+import { useForm } from "react-hook-form";
+
 const SignIn = () => {
 
 
 
 
-  const [useremail,SetUseremail]=useState("")
-  const [userpassword,SetUserpassword]=useState("")
-  const [currentUser, setCurrentUser] = useState(false);
+
+  const [loader, setLoader] = useState(false);
   const navigate=useNavigate()
   const {user, setUser}=useContext(UserContext)
 
 
-
-useEffect(() => {
-  
-
-}, []);  // only once on page load
-
-// const getUser = async () => {
-//   const res = await supabase.auth.getUser();
-//   console.log(res);
-
-//   if (res.data.user) {
-//     setUser(true);
-//   }else{
-//     setUser(false)
-//   }
-// };
+type LoginForm = {
+  email: string;
+  password: string;
+};
 
 
 
+  const {
+  register,
+  handleSubmit,
+  formState: { errors },
+} = useForm<LoginForm>();
 
+const onSubmit = (data: LoginForm) => {
+  handleSignin(data.email, data.password);
+};
+
+
+
+
+
+
+  const signInWithGoogle = async () => {
+    try{
+      const { error, data } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/Chat`, 
+      },
+    });
+
+    if (error) {
+      alert(error.message);
+    }else{
+      console.log(data);
+      
+      localStorage.setItem("username", JSON.stringify(true));
+const username = JSON.parse(localStorage.getItem("username"));
+
+
+      setUser(JSON.parse(localStorage.getItem("username")))
+    }}catch(error){
+        alert(error.message)
+    }
+  }
 
 
   const handleSignin = async (email:string,password:string) => {
     try {
+      setLoader(true)
       const { error } = await supabase.auth.signInWithPassword({ email, password });
      const res = await supabase.auth.getUser(); 
 
-    if (error && !res){
+    if (error){
 
-      alert(error.message)
-      //  toast.error(error.message, {
-      //   position: "bottom-right",
-      //   style: {
-      //     background: "rgba(255,255,255,0.1)",
-      //     backdropFilter: "blur(10px)",
-      //     border: "1px solid rgba(255,255,255,0.2)",
-      //     color: "#fff",
-      //   },
-      // });
+      setLoader(false)
+       toast.error(error.message, {
+        position: "bottom-right",
+    icon: (
+    <span
+      style={{
+        background: "linear-gradient(to right, #fa8638, #089faf)",
+        WebkitBackgroundClip: "text",
+        color: "#ffffff",
+        fontSize: "1.3rem",
+        fontWeight: "bold",
+      }}
+    >
+      X
+    </span>
+  ),
+  style: {
+    background: "linear-gradient(to right, #fa8638, #089faf)",
+    color: "#ffffff",
+    borderRadius: "0.75rem",
+    fontWeight: "500",
+    boxShadow: "0 0 15px rgba(16,185,129,0.3)",
+  },
+
+      });
     }else {
+      setLoader(false)
 localStorage.setItem("username", JSON.stringify(true));
 const username = JSON.parse(localStorage.getItem("username"));
 
 
       setUser(JSON.parse(localStorage.getItem("username")))
  
-      // alert("Login Success Fully")
+
       const sessionId = Date.now().toString();
   localStorage.setItem("chat_session", sessionId);
          
@@ -95,7 +138,8 @@ toast.success("Login Succesfuly!", {
 
     }
     } catch (error) {
-      alert(error.message)
+      setLoader(false)
+      // alert(error.message)
          toast.error(error.message, {
         position: "bottom-right",
         style: {
@@ -128,42 +172,62 @@ toast.success("Login Succesfuly!", {
           <p className="text-muted-foreground">Sign in to continue creating winning pitches</p>
         </div>
 
-        <form className="space-y-4" onSubmit={(e)=>{ e.preventDefault(); handleSignin(useremail,userpassword)}}>
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium text-foreground">Email</label>
-            <input
-              id="email"
-              type="email"
-              placeholder="you@company.com"
-              className="w-full h-11 px-3 py-2 rounded-md border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              onChange={(e)=>{SetUseremail(e.target.value)}}
-            />
-          </div>
+       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
 
-          <div className="space-y-2">
-            {/* <div className="flex items-center justify-between">
-              <label htmlFor="password" className="text-sm font-medium text-foreground">Password</label>
-              <Link to="#" className="text-sm text-primary hover:underline">
-                Forgot password?
-              </Link>
-            </div> */}
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              className="w-full h-11 px-3 py-2 rounded-md border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              onChange={(e)=>{SetUserpassword(e.target.value)}}
-            />
-          </div>
 
-          <button
-            type="submit"
-            className="w-full h-11 px-4 py-2 rounded-md bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:opacity-90 transition-opacity font-medium"
-            // onClick={()=>}
-          >
-            Sign In
-          </button>
-        </form>
+  <div className="space-y-2">
+    <label className="text-sm font-medium text-foreground">Email</label>
+    <input
+      type="email"
+      placeholder="you@company.com"
+      className="w-full h-11 px-3 py-2 rounded-md border border-input bg-background
+      focus:outline-none focus:ring-2 focus:ring-ring"
+      {...register("email", {
+        required: "Email is required",
+        pattern: {
+          value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+          message: "Invalid email format",
+        },
+      })}
+    />
+    {errors.email && (
+      <p className="text-sm text-red-500">{errors.email.message}</p>
+    )}
+  </div>
+
+
+  <div className="space-y-2">
+    <input
+      type="password"
+      placeholder="••••••••"
+      className="w-full h-11 px-3 py-2 rounded-md border border-input bg-background
+      focus:outline-none focus:ring-2 focus:ring-ring"
+      {...register("password", {
+        required: "Password is required",
+        minLength: {
+          value: 6,
+          message: "Password must be at least 6 characters",
+        },
+      })}
+    />
+    {errors.password && (
+      <p className="text-sm text-red-500">{errors.password.message}</p>
+    )}
+  </div>
+
+  <button
+    type="submit"
+    className="w-full h-11 rounded-md bg-gradient-to-r from-primary to-primary/90
+    text-primary-foreground font-medium hover:opacity-90 flex justify-center items-center"
+  >
+  {loader ?
+
+   <div className="download-loader"></div>:""
+  } 
+    Sign In
+  </button>
+
+</form>
 
         <div className="mt-6 text-center text-sm">
           <span className="text-muted-foreground">Don't have an account? </span>
@@ -181,8 +245,8 @@ toast.success("Login Succesfuly!", {
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-3">
-          <button className="h-11 px-4 py-2 rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors inline-flex items-center justify-center font-medium">
+        <div className="mt-6 grid grid-cols-1 gap-3">
+          <button onClick={signInWithGoogle} className="h-11 px-4 py-2 rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors inline-flex items-center justify-center font-medium">
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -202,12 +266,6 @@ toast.success("Login Succesfuly!", {
               />
             </svg>
             Google
-          </button>
-          <button className="h-11 px-4 py-2 rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors inline-flex items-center justify-center font-medium">
-            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-            </svg>
-            GitHub
           </button>
         </div>
       </div>

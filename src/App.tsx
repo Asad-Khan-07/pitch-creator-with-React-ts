@@ -11,6 +11,7 @@ import { lazy, Suspense, useContext, useState } from "react";
 import { UserContext } from "./authcontext";
 import { ToastContainer } from "react-toastify";
 import { Sparkles } from "lucide-react";
+import Generated from "./pages/Generated";
 
 const App = () => {
   const username = JSON.parse(localStorage.getItem("username"));
@@ -118,6 +119,29 @@ const App = () => {
             element={
               user ? (
                 < ColorPalette/>
+              ) : (
+                <div className="flex min-h-screen items-center justify-center bg-muted">
+                  <div className="text-center">
+                    <h1 className="mb-4 text-4xl font-bold">401</h1>
+                    <p className="mb-4 text-xl text-muted-foreground">
+                      Authentication is required
+                    </p>
+                    <a
+                      href="/signin"
+                      className="text-primary underline hover:text-primary/90"
+                    >
+                      Return to Sign in
+                    </a>
+                  </div>
+                </div>
+              )
+            }
+          />
+          <Route
+            path="/Generated"
+            element={
+              user ? (
+                < Generated/>
               ) : (
                 <div className="flex min-h-screen items-center justify-center bg-muted">
                   <div className="text-center">

@@ -1,11 +1,11 @@
 import supabase from "@/supabasecreate";
 import jsPDF from "jspdf";
 
-    const fileName = `image_${Date.now()}.png`;
+// const fileName = `image_${Date.now()}.png`;
 
 export const uploadToStorage = async (blob:Blob) => {
   try {
-    // const fileName = `image_${Date.now()}.png`;
+    const fileName = `image_${Date.now()}.png`;
 
     const { data, error } = await supabase.storage
       .from("images") 
@@ -16,10 +16,10 @@ export const uploadToStorage = async (blob:Blob) => {
     if (error) {
       console.log("Upload error:", error);
     //   return null;
-    }else{
-        console.log("Image Uplode successfuly");
-        
     }
+        console.log("Image Uplode successfuly");
+        return fileName        
+    
 
     // console.log(data);
     
@@ -42,7 +42,7 @@ export const uploadToStorage = async (blob:Blob) => {
 
 
 
-export const uploadTotable = async () => {
+export const uploadTotable = async (fileName) => {
   try {
 
 
@@ -80,16 +80,21 @@ export const uploadTotable = async () => {
 
 
 
-export const handleExport = (User_Startup,Generated_Pitch) => {
+export const handleExport = (Generated_Pitch) => {
   const doc = new jsPDF();
 
-  doc.setFontSize(18);
-  doc.text(User_Startup, 10, 20);
+const plainText = Generated_Pitch
+    .map((el) => {
+      
+      return el.props.children;
+    })
+    .join("\n\n");
+
 
   doc.setFontSize(12);
-  doc.text(Generated_Pitch, 10, 35, { maxWidth: 180 });
+  doc.text(plainText, 10, 35, { maxWidth: 180 });
 
-  doc.save(`${User_Startup}.pdf`);
+  doc.save(`pitch.pdf`);
 };
 
 

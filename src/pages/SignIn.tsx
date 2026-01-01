@@ -44,7 +44,7 @@ const onSubmit = (data: LoginForm) => {
       const { error, data } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/Chat`, 
+        redirectTo: `${window.location.origin}/history`, 
       },
     });
 
@@ -109,7 +109,7 @@ const username = JSON.parse(localStorage.getItem("username"));
       const sessionId = Date.now().toString();
   localStorage.setItem("chat_session", sessionId);
          
-      navigate("/chat")
+      navigate("/history")
 toast.success("Login Succesfuly!", {
   position: "bottom-right",
   icon: (

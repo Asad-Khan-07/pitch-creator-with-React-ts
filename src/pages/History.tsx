@@ -7,6 +7,10 @@ import {
   ArrowDown,
   ArrowRightSquare,
   Sparkles,
+  Box,
+  Inbox,
+  Database,
+
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Skeleton from "react-loading-skeleton";
@@ -17,152 +21,132 @@ import { handleExport } from "@/storage";
 import { toast } from "react-toastify";
 
 const History = () => {
-  const [userhistory, setUserhistory] = useState([]);
-  const [monthhistory, setMonthhistory] = useState([]);
-  const [searchinput, setSearchinput] = useState<string>("");
-  const [firstfive, setFirstfive] = useState([]);
-  const [searchhistory, setSearchhistory] = useState(undefined);
-  const [show, setShow] = useState<boolean>(true);
-  const [segment, setSegment] = useState<boolean>(true);
+  const [userhistory, setUserhistory] = useState([]);  
   const [image, setImages] = useState([]);
-  const [loader, setLoader] = useState(false);
-  const [user, setUser] = useState<any>([]);
+  const [user, setUser] = useState(null);
+  const [pitch, setPitch] = useState([]);
+  const [currenthistory, setCurrenthistory] = useState([]);
 
-  useEffect(() => {
-    const history = async () => {
-      const user = await supabase.auth.getUser();
 
-      const now: Date = new Date();
 
-      const startOfMonth: string = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        1
-      ).toISOString();
-
-      const startOfNextMonth = new Date(
-        now.getFullYear(),
-        now.getMonth() + 1,
-        1
-      ).toISOString();
-
-      const { data, error } = await supabase
-        .from("Model")
-        .select("*")
-        .eq("User", user.data.user.email)
-        .gte("Time", startOfMonth)
-        .lt("Time", startOfNextMonth)
-        .order("Time", { ascending: false });
-
-      if (error)
-        //  console.log(error.message);
-        // console.log(data);
-
-        setMonthhistory(data);
-    };
-
-    history();
-  }, []);
-
-  useEffect(() => {
-    const history = async () => {
-      setLoader(true);
-      const user = await supabase.auth.getUser();
-      console.log(user);
-      setUser(user.data.user);
-      const { data, error } = await supabase
-        .from("Model")
-        .select("*")
-        .eq("User", user.data.user.email)
-        .order("Time", { ascending: false });
-
-      if (error) {
-        // console.log(error.message);
-        setLoader(false);
-      } else {
-        setUserhistory(data);
-        setFirstfive(data.slice(0, 6));
-        setLoader(false);
-      }
-    };
-    history();
-  }, []);
-
-  const searchbtn = () => {
-    if (!searchinput.trim()) return;
-
-    const item = userhistory.filter(
-      (i) => i.User_Startup === searchinput.toLowerCase()
-    );
-
-    if (item.length > 0) {
-      setTimeout(() => {}, 2000);
-      setShow(!show);
-      setSearchhistory(item);
-    } else {
-      // console.log("items not found");
-      setSearchhistory("items not found");
-    }
-  };
-  const Loadmore = () => {
-    setFirstfive(userhistory.slice(0));
-  };
-
-  const Fetchimages = async () => {
+useEffect(()=>{
+  
+  
+  const fetchImages = async () => {
     const user = await supabase.auth.getUser();
-    const { data, error } = await supabase
+    
+    const { data } = await supabase
+    .from("Images")
+    .select("*")
+    .eq("User", user.data.user.email)
+    .order("created_at", { ascending: false });
+    // console.log(data);
+    
+        setImages(data)
 
-      .from("Images")
-      .select("*")
-      .eq("User", user.data.user.email)
-      // .eq("Session_id", sessionId)
-      .order("created_at", { ascending: false });
+    };
 
-    if (error) {
-      // console.log(error.message);
-    } else {
-      // console.log(data);
+    fetchImages();
 
-      setImages(data);
-      // setFetch(true)
-    }
-  };
 
-  useEffect(() => {
-    Fetchimages();
-  }, []);
+    const fetchHistory = async () => {
+      const user = await supabase.auth.getUser();
+
+        const { data } = await supabase
+        .from("Model")
+        .select("*")
+        .eq("User", user.data.user.email)
+        .order("Time", { ascending: false });
+        setUserhistory(data)
+        console.log(data);
+        setPitch(data)
+        setUser(user.data.user)
+
+    };
+
+    fetchHistory();
+
+
+
+const fetchCurrent = async () => {
+  const { data: userData } = await supabase.auth.getUser();
+  const email = userData.user.email;
+  const startOfMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    1
+  ).toISOString();
+
+  const endOfMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth() + 1,
+    0,
+    23,
+    59,
+    59
+  ).toISOString();
+
+  const { data, error } = await supabase
+    .from("Model")
+    .select("*")
+    .eq("User", email)
+    .gte("Time", startOfMonth)
+    .lte("Time", endOfMonth)
+    .order("Time", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  setCurrenthistory(data);
+ 
+};
+
+fetchCurrent();
+
+
+
+
+},[])
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-accent">
       <Navbar />
       <div className="container mx-auto px-4 pt-24 pb-12 ">
         <div className="max-w-6xl mx-auto ">
-          <div className="mb-8 flex items-center gap-5">
-            {user.email ? (
-              <div className="bg-gradient-to-r from-primary to-secondary rounded-full w-28 h-28 p-5">
-                {/* {user.user_metadata.avatar_url } */}
-                {/* <img src={user.user_metadata.avatar_url} alt="" className="w-28 h-28"/> */}
+          <div className="mb-8 flex items-center gap-5 md:flex-row flex-col">
+            { user ? (
+              <div className="bg-gradient-to-r from-primary to-secondary rounded-full w-28 h-28 ">
+                {/* {user.email.splice(0,1) } */}
+                {user.user_metadata.avatar_url ?
+                <img src={user.user_metadata.avatar_url} alt="" className="w-28 h-28 rounded-full" />
+              :""
+              }
               </div>
-            ) : (
+             ) : ( 
               <Skeleton width={120} className="rounded-full" height={120} />
-            )}
-            <div>
-              <p className="text-3xl font-bold text-foreground">
-                {user.email ? " Welcom back" : <Skeleton width={200} />}
+             )} 
+            <div className="flex flex-col flex-wrap text-wrap">
+              <p className="text-3xl text-center md:text-start font-bold text-foreground">
+              
+                {user ? " Welcom back" : <Skeleton width={200} />}
               </p>
-              <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              <h1 className="text-4xl text-center  font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 {/* {user.user_metadata.full_name ? user.user_metadata.full_name : ""} */}
               </h1>
-              <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                {user.email ? user.email : <Skeleton width={550} />}
+              <h1 className="text-lg  font-bold text-ellipsis mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                {user ? user.email : <Skeleton width={300} />}
               </h1>
             </div>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            {user.email ? (
-              <div className="p-6 rounded-lg border border-border bg-card ">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            {user ? (
+              <div className="p-6 rounded-lg border border-border bg-card transition-all ease-linear   shadow-lg hover:scale-110 ">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">
@@ -175,29 +159,29 @@ const History = () => {
                   <FileText className="w-10 h-10 text-primary/20" />
                 </div>
               </div>
-            ) : (
-              <Skeleton width={350} height={100} />
+             ) : ( 
+              <Skeleton width={290} height={100} />
             )}
-            {user.email ? (
-              <div className="p-6 rounded-lg border border-border bg-card">
+             {user ? ( 
+              <div className="p-6 rounded-lg border border-border bg-card transition-all ease-linear   shadow-lg hover:scale-110">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">
                       This Month
                     </p>
                     <p className="text-3xl font-bold text-foreground">
-                      {monthhistory.length}
+                      {currenthistory.length}
                     </p>
                   </div>
                   <Calendar className="w-10 h-10 text-secondary/20" />
                 </div>
               </div>
             ) : (
-              <Skeleton width={350} height={100} />
+              <Skeleton width={290} height={100} />
             )}
 
-            {user.email ? (
-              <div className="p-6 rounded-lg border border-border bg-card">
+             {user ? ( 
+              <div className="p-6 rounded-lg border border-border bg-card transition-all ease-linear   shadow-lg hover:scale-110">
                 <div className="flex items-center   justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">
@@ -210,264 +194,184 @@ const History = () => {
                   <Image className="w-10 h-10 text-accent-foreground/20" />
                 </div>
               </div>
-            ) : (
-              <Skeleton width={350} height={100} />
-            )}
+            ) : ( 
+              <Skeleton width={290} height={100} />
+             )}
+             {user ? ( 
+              <div className="p-6 rounded-lg border border-border bg-card transition-all ease-linear   shadow-lg hover:scale-110">
+                <div className="flex items-center   justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Saved Platter
+                    </p>
+                    <p className="text-3xl font-bold text-foreground">
+                      {image.length}
+                    </p>
+                  </div>
+                  <Image className="w-10 h-10 text-accent-foreground/20" />
+                </div>
+              </div>
+            ) : ( 
+              <Skeleton width={290} height={100} />
+             )}
           </div>
 
-          {loader ? (
-            <div className="icon-load flex items-center justify-center h-20 w-full ">
-              <Sparkles size={100} className="text-primary" />
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-6 m-10 ">
-              <button
-                className={`px-4 py-2 border-b-4 ${
-                  segment ? "border-primary" : "border-none"
-                } text-foreground hover:opacity-90 transition-all 0s 1s ease-linear`}
-                onClick={() => {
-                  setSegment(true);
-                }}
-              >
-                Pitches
-              </button>
-              <button
-                className={`px-4 py-2 border-b-4 ${
-                  !segment ? "border-primary" : "border-none"
-                } text-foreground hover:opacity-90 transition-all 0s 1s ease-linear`}
-                onClick={() => {
-                  setSegment(false);
-                }}
-              >
-                Imgaes
-              </button>
-            </div>
-          )}
 
-          {segment ? (
-            <div className="">
-              {userhistory.length > 0 ? (
-                <div className="p-6 mb-8 rounded-lg border border-border bg-card">
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="flex-1 relative">
-                      <input
-                        placeholder="Search pitches..."
-                        className="w-full h-11 pl-10 pr-3 py-2 rounded-md border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                        onChange={(e) => {
-                          setSearchinput(e.target.value);
-                        }}
-                      />
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={searchbtn}
-                        className="h-11 px-4 py-2 rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors font-medium inline-flex items-center gap-2"
-                      >
-                        {show === false ? (
-                          <>
-                            <ArrowRightSquare /> Back
-                          </>
-                        ) : (
-                          <>
-                            <Search className="w-4 h-4" /> Search
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                ""
-              )}
+     <div className="flex flex-col  justify-between  h-2/2  ">
 
-              {show === true ? (
-                <div className="grid md:grid-cols-2 gap-6">
-                  {firstfive.map((pitch, i) => (
-                    <div
-                      key={i}
-                      className="overflow-auto rounded-lg border border-border bg-card hover:shadow-lg transition-shadow group"
-                    >
-                      {!pitch ? (
-                        <Skeleton />
-                      ) : (
-                        <div className="p-6">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="overflow-auto">
-                              <h3 className="text-lg font-semibold mb-1">
-                                {pitch.User_Startup}
-                              </h3>
-                              <p className="text-sm text-muted-foreground text-justify flex items-center gap-2">
-                                <Calendar className="w-4 h-4" />
-                                {new Date(pitch.date).toLocaleDateString()}
-                                {pitch.Generated_Pitch}
-                              </p>
-                            </div>
-                          </div>
 
-                          <div className="flex gap-2 pt-4 border-t border-border">
-                            <span
-                              className={`px-2.5 py-0.5 rounded-full text-xs font-medium `}
-                            >
-                              {pitch.status}
-                            </span>
 
-                            <button
-                              onClick={() =>
-                                handleExport(
-                                  pitch.User_Startup,
-                                  pitch.Generated_Pitch
-                                )
-                              }
-                              className="flex-1 h-9 px-3 py-2 rounded-md bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:opacity-90 transition-opacity text-sm font-medium inline-flex items-center justify-center gap-2"
-                            >
-                              <Download className="w-4 h-4" />
-                              Export
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="grid md:grid-cols-2 gap-6 ">
-                  {searchhistory.map((pitch, i) => (
-                    <div
-                      key={i}
-                      className="overflow-auto rounded-lg border border-border bg-card hover:shadow-lg transition-shadow group"
-                    >
-                      <div className="p-6" key={i}>
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="overflow-auto">
-                            <h3 className="text-lg font-semibold mb-1">
-                              {pitch.User_Startup}
-                            </h3>
-                            <p className="text-sm text-muted-foreground text-justify flex items-center gap-2">
-                              <Calendar className="w-4 h-4" />
-                              {new Date(pitch.date).toLocaleDateString()}
-                              {pitch.Generated_Pitch}
-                            </p>
-                          </div>
-                        </div>
 
-                        <div className="flex gap-2 pt-4 border-t border-border">
-                          <span
-                            className={`px-2.5 py-0.5 rounded-full text-xs font-medium `}
-                          >
-                            {pitch.status}
-                          </span>
 
-                          <button
-                            onClick={() =>
-                              handleExport(
-                                pitch.User_Startup,
-                                pitch.Generated_Pitch
-                              )
-                            }
-                            className="flex-1 h-9 px-3 py-2 rounded-md bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:opacity-90 transition-opacity text-sm font-medium inline-flex items-center justify-center gap-2"
-                          >
-                            <Download className="w-4 h-4" />
-                            Export
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="mt-8 flex justify-center ">
-                {userhistory.length > 6 ? (
-                  <button
-                    onClick={Loadmore}
-                    className="px-8 py-3 flex rounded-md border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-base font-medium"
+                <div className="flex flex-row gap-10 justify-around items-center flex-wrap">
+
+{user ?
+
+<div className="w-96 ">
+   
+
+     <h1 className="text-3xl text-center md:text-start font-bold text-foreground">Last Pitch</h1>
+
+                { pitch.length > 0 ? pitch.splice(0,1).map((pitch, i) => (
+                  <div
+                    key={i}
+                    className="rounded-lg shadow-lg w-full bg-card"
                   >
-                    <ArrowDown />
-                    Show More Pitches
-                  </button>
-                ) : (
-                  <div>No More Results</div>
-                )}
+                    <div className="p-8 ">
+                      <h3 className="text-lg font-semibold">
+                        {pitch.User_Startup}
+                      </h3>
+
+                      <p className="text-sm text-muted-foreground flex gap-2  items-center">
+                        <Calendar size={14} />
+                        {new Date(pitch.Time).toLocaleDateString()}
+                      </p>
+
+                 
+                    </div>
+
+                  </div>
+)) : <div className=" p-4  bg-card rounded-lg shadow-lg">
+                
+                <div className="h-20 flex flex-col items-center justify-center">
+                       <p className="text-center text-sm text-muted-foreground mb-1">
+                      No Pitch Generated Yet
+                    </p>
+                      <FileText/>
+                </div>
+                
+                </div>
+              
+
+}
+
+</div>: <Skeleton width={290} height={100}/ >
+}
+
+{user ?
+
+<div className=" w-96 ">
+
+<h1 className="text-3xl text-center md:text-start font-bold text-foreground">Last Image</h1>
+
+
+
+
+            <div className="rounded-lg  shadow-lg  bg-card">
+             
+              {
+                image.length > 0 ?
+                image.slice(0,1).map((img, i) => (
+                  <div key={i} className=" p-4 ">
+                  <img src={img.images} alt="" className="h-20"/>
+
+                
+                </div>
+              )):<div className=" p-4 bg-card rounded-lg shadow-lg">
+                
+                <div className="h-20 flex flex-col items-center justify-center">
+                       <p className="text-center text-sm text-muted-foreground mb-1">
+                      No Image Generated Yet
+                    </p>
+                      <FileText/>
+                </div>
+                
+                </div>
+              
+              
+              }
+              </div>
+
+
+
+
+
+              </div>
+
+:<Skeleton width={290} height={100}/ >
+}
+</div>
+
+
+
+
+   <div className="mt-6 grid grid-cols-2 md:grid-cols-2  gap-4">
+            <div className="p-4 rounded-lg border border-border bg-card hover:shadow-md transition-shadow cursor-pointer">
+              <div className="flex items-start gap-3">
+                <Sparkles className="w-5 h-5 text-primary mt-1" />
+                <div>
+                  <h3 className="font-semibold text-sm mb-1">Quick Start</h3>
+                  <p className="text-xs text-muted-foreground">
+                    "I need a pitch for a SaaS platform"
+                  </p>
+                </div>
               </div>
             </div>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-6 text-center">
-              {image.map((pitch, i) => (
-                <div
-                  key={i}
-                  className="overflow-auto rounded-lg border border-border bg-card hover:shadow-lg transition-shadow group"
-                >
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="overflow-auto">
-                        {/* <h3 className="text-lg font-semibold mb-1">{pitch.User_Startup}</h3> */}
-                        {/* <p className="text-sm text-muted-foreground text-justify flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        {new Date(pitch.date).toLocaleDateString()}
-                        {pitch.Generated_Pitch}
-                      </p> */}
-                        {pitch ? (
-                          <img src={pitch.images} alt="" />
-                        ) : (
-                          <Skeleton width={200} />
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-2 pt-4 border-t border-border">
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-xs font-medium `}
-                      >
-                        {/* {pitch.status} */}
-                      </span>
 
-                      <button
-                        onClick={async () => {
-                          try {
-                            const response = await fetch(pitch.images);
-                            const blob = await response.blob();
 
-                            const url = window.URL.createObjectURL(blob);
-                            const link = document.createElement("a");
-
-                            link.href = url;
-                            link.download = pitch.images.split("/").pop();
-                            document.body.appendChild(link);
-                            link.click();
-
-                            document.body.removeChild(link);
-                            window.URL.revokeObjectURL(url);
-                          } catch (err) {
-                            toast.error(`${err} Download failed`, {
-                              position: "bottom-right",
-                              style: {
-                                background:
-                                  "linear-gradient(to right, #fa8638, #089faf)",
-                                color: "#ffffff",
-                                borderRadius: "0.75rem",
-                                fontWeight: "500",
-                                boxShadow: "0 0 15px rgba(16,185,129,0.3)",
-                              },
-                            });
-
-                            // console.error("Download failed", err);
-                          }
-                        }}
-                        className="flex-1 h-9 px-3 py-2 rounded-md bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:opacity-90 transition-opacity text-sm font-medium inline-flex items-center justify-center gap-2"
-                      >
-                        <Download className="w-4 h-4" />
-                        Dowload
-                      </button>
-                    </div>
-                  </div>
+              <div className="p-4 rounded-lg border border-border bg-card hover:shadow-md transition-shadow cursor-pointer">
+              <div className="flex items-start gap-3">
+                <Sparkles className="w-5 h-5 text-accent-foreground mt-1" />
+                <div>
+                  <h3 className="font-semibold text-sm mb-1">Generation of Image</h3>
+                  <p className="text-xs text-muted-foreground">
+                    "Generate images in Seconds"
+                  </p>
                 </div>
-              ))}
+              </div>
             </div>
-          )}
 
-          {image.length == 0 ? (
-            <div className="text-center">Not found</div>
-          ) : (
-            ""
-          )}
+            <div className="p-4 rounded-lg border border-border bg-card hover:shadow-md transition-shadow cursor-pointer">
+              <div className="flex items-start gap-3">
+                <Sparkles className="w-5 h-5 text-secondary mt-1" />
+                <div>
+                  <h3 className="font-semibold text-sm mb-1">Refine Existing</h3>
+                  <p className="text-xs text-muted-foreground">
+                    "Improve my value proposition"
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-lg border border-border bg-card hover:shadow-md transition-shadow cursor-pointer">
+              <div className="flex items-start gap-3">
+                <Sparkles className="w-5 h-5 text-accent-foreground mt-1" />
+                <div>
+                  <h3 className="font-semibold text-sm mb-1">Get Feedback</h3>
+                  <p className="text-xs text-muted-foreground">
+                    "Review my pitch deck structure"
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+
+
+
+                              </div>
+
         </div>
       </div>
     </div>

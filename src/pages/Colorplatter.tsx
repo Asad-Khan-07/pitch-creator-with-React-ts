@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { RefreshCw, Save } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import supabase from "@/supabasecreate";
 
 export default function GenerateColor() {
   const [history, setHistory] = useState([]);
+  const [color, setColor] = useState([]);
 
   const randomHex = () =>
     `#${Math.floor(Math.random() * 16777215)
@@ -17,6 +19,14 @@ export default function GenerateColor() {
 
   const copyToClipboard = (color) => {
     navigator.clipboard.writeText(color);
+  };
+
+  const Saved = async (color: any) => {
+    const btn = document.querySelectorAll(".btn")[1];
+    const attribute = btn.getAttribute("title");
+    const user = await supabase.auth.getUser();
+    console.log(user.data.user.email);
+    console.log(attribute);
   };
 
   return (
@@ -54,7 +64,7 @@ export default function GenerateColor() {
                     <button
                       key={i}
                       onClick={() => copyToClipboard(color)}
-                      className="w-12 h-12 rounded-lg shadow-md text-xs text-transparent hover:scale-110 transition show"
+                      className="btn w-12 h-12 rounded-lg shadow-md text-xs text-transparent hover:scale-110 transition show"
                       style={{ backgroundColor: color }}
                       title={color}
                     >
@@ -71,8 +81,13 @@ export default function GenerateColor() {
                       month: "short",
                       year: "numeric",
                     })}{" "}
+                    <Save
+                      className="cursor-pointer text-[#089fafe6]"
+                      onClick={() => {
+                        Saved(color);
+                      }}
+                    />
                   </span>
-                  <Save className="cursor-pointer text-[#089fafe6]" />
                 </div>
               </div>
             ))}

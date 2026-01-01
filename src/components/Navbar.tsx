@@ -89,6 +89,9 @@ getUser()
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
+                        <Link to="/history" className="text-foreground/70 hover:text-foreground transition-colors">
+              Dash Board
+            </Link>
             <Link to="/chat" className="text-foreground/70 hover:text-foreground transition-colors">
               Chat
             </Link>
@@ -98,9 +101,10 @@ getUser()
             <Link to="/color" className="text-foreground/70 hover:text-foreground transition-colors">
               Color Platter
             </Link>
-            <Link to="/history" className="text-foreground/70 hover:text-foreground transition-colors">
-              History
+            <Link to="/Generated" className="text-foreground/70 hover:text-foreground transition-colors">
+             Generated Pitches & Images
             </Link>
+
 
             <div className="flex items-center ">
               {/* <Link to="/signin">
@@ -134,6 +138,13 @@ getUser()
         {isMenuOpen && (
           <div className="md:hidden mt-4 pb-4 space-y-3 animate-fade-in">
             <Link
+              to="/history"
+              className="block py-2 text-foreground/70 hover:text-foreground transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Dash Board
+            </Link>
+            <Link
               to="/chat"
               className="block py-2 text-foreground/70 hover:text-foreground transition-colors"
               onClick={() => setIsMenuOpen(false)}
@@ -146,17 +157,20 @@ getUser()
               onClick={() => setIsMenuOpen(false)}
             >
               Image Generator
-            </Link>            
-            <Link to="/color" className="text-foreground/70 hover:text-foreground transition-colors">
+            </Link>
+                      
+            <Link to="/color" className="block py-2 text-foreground/70 hover:text-foreground transition-colors">
               Color Platter
             </Link>
+            
             <Link
-              to="/history"
+              to="/Generated"
               className="block py-2 text-foreground/70 hover:text-foreground transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
-              History
+              Generated Pitches & Images
             </Link>
+            
              
             <div className="flex flex-col gap-2 pt-2">
               <Link to="/signin" onClick={() => setIsMenuOpen(false)}>

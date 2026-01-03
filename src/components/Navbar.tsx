@@ -93,7 +93,7 @@ getUser()
               Dash Board
             </Link>
             <Link to="/chat" className="text-foreground/70 hover:text-foreground transition-colors">
-              Chat
+              Pitch Creator
             </Link>
             <Link to="/image-generator" className="text-foreground/70 hover:text-foreground transition-colors">
               Image Generator
@@ -149,7 +149,7 @@ getUser()
               className="block py-2 text-foreground/70 hover:text-foreground transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
-              Chat
+              Pitch Creator
             </Link>
             <Link
               to="/image-generator"

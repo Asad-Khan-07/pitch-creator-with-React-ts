@@ -13,7 +13,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@hookform/resolvers": "^3.10.0",
-    "@huggingface/hub": "^2.7.1",    
+    "@huggingface/hub": "^2.7.1",
     "@tanstack/react-query": "^5.83.0",
     "axios": "^1.13.2",
     "class-variance-authority": "^0.7.1",
@@ -23,6 +23,7 @@
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "jspdf": "^3.0.4",
+    "lovable-tagger": "^1.1.13",
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
     "react": "^18.3.1",

@@ -1,3 +1,4 @@
+import { UserContext } from "@/authcontext";
 import Navbar from "@/components/Navbar";
 import { handleExport } from "@/storage";
 import supabase from "@/supabasecreate";
@@ -9,13 +10,15 @@ import {
   Search,
   Sparkles,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Skeleton from "react-loading-skeleton";
 import { toast } from "react-toastify";
 
 const Generated = () => {
   const [segment, setSegment] = useState(true);
   const [loader, setLoader] = useState(false);
+
+
 
   const [userhistory, setUserhistory] = useState([]);
   const [firstfive, setFirstfive] = useState([]);
@@ -146,7 +149,7 @@ const formattedPitch = data.map((ech) => {
 
           {segment ? (
             <>
-              {userhistory.length > 0 && (
+              {/* {userhistory.length > 0 && (
                 <div className="p-6 mb-8 rounded-lg border bg-card ">
                   <div className="flex gap-3 flex-wrap">
                     <input
@@ -175,7 +178,7 @@ const formattedPitch = data.map((ech) => {
                     </button>
                   </div>
                 </div>
-              )}
+              )} */}
 
 
               <div className="grid md:grid-cols-2 gap-6">

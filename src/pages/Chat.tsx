@@ -86,16 +86,14 @@ Future Vision:
       const aiReply = res.data.candidates[0].content.parts[0].text;
       const user = await supabase.auth.getUser();
 
-      const { error: aiError } = await supabase
-        .from("Model")
-        .insert([
-          {
-            User_Startup: input,
-            Generated_Pitch: aiReply,
-            User: user.data.user.email,
-            Session_id: sessionId,
-          },
-        ]);
+      const { error: aiError } = await supabase.from("Model").insert([
+        {
+          User_Startup: input,
+          Generated_Pitch: aiReply,
+          User: user.data.user.email,
+          Session_id: sessionId,
+        },
+      ]);
       setRefresh(!refresh);
     } catch (error) {
       toast.success(`${error} error to sent`, {

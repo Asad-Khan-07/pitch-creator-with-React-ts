@@ -16,6 +16,8 @@ import Generated from "./pages/Generated";
 const App = () => {
   const username = JSON.parse(localStorage.getItem("username"));
   const [user, setUser] = useState(username);
+  const [length, setLenght] = useState("");
+
      const Blog = lazy(() => {
     return new Promise((resolve:any) => {
       setTimeout(() => resolve(import("./pages/Chat")), 2000);

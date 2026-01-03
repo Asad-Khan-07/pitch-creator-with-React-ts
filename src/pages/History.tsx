@@ -26,11 +26,13 @@ const History = () => {
   const [user, setUser] = useState(null);
   const [pitch, setPitch] = useState([]);
   const [currenthistory, setCurrenthistory] = useState([]);
+  const [colorlenght, setColorlenght] = useState([]);
 
 
 
 useEffect(()=>{
   
+
   
   const fetchImages = async () => {
     const user = await supabase.auth.getUser();
@@ -58,7 +60,7 @@ useEffect(()=>{
         .eq("User", user.data.user.email)
         .order("Time", { ascending: false });
         setUserhistory(data)
-        console.log(data);
+        // console.log(data);
         setPitch(data)
         setUser(user.data.user)
 
@@ -107,8 +109,42 @@ fetchCurrent();
 
 
 
+  const fetchSavedColors = async () => {
+    try {
+      const user = await supabase.auth.getUser();
+      if (!user.data.user) return;
+
+      const { data, error } = await supabase
+        .from("Color")
+        .select("*")
+        .eq("User", user.data.user.email)
+        .order("created_at", { ascending: false });
+
+      if (!error) {
+        const colors = data.map((item: any) => {
+         
+            return JSON.parse(item.Generated_Color);
+         
+        });
+        console.log(data.length);
+        
+        setColorlenght(data);
+      } else {
+        console.log("Error fetching saved colors:", error.message);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+fetchSavedColors()
+
 
 },[])
+
+
+
+
 
 
 
@@ -205,7 +241,7 @@ fetchCurrent();
                       Saved Platter
                     </p>
                     <p className="text-3xl font-bold text-foreground">
-                      {image.length}
+                      {length}
                     </p>
                   </div>
                   <Image className="w-10 h-10 text-accent-foreground/20" />
